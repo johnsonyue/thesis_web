@@ -38,7 +38,7 @@ function init_query_func(){
     xmlHttpRequest.send(post_str);
 }
 
-var dataset, table_list,num_page;
+var dataset, table_list, num_page, monitor_json;
 
 function init_query_ready(){
     if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
@@ -48,7 +48,8 @@ function init_query_ready(){
         active_page = 0;
         num_page = Math.ceil(info_json.num_node/page_size);
 
-        query_page();
+        monitor_query_func();
+        //query_page();
 
         $("#prev").click(function(){
             start_page = 0;
@@ -60,6 +61,25 @@ function init_query_ready(){
             active_page = num_page-1;
             query_page();
         });
+    }
+}
+
+function monitor_query_func(){
+    var url = "query.php";
+    var post_str = "type=monitor&date="+date;
+
+    xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.open("POST", url, true);
+    xmlHttpRequest.onreadystatechange = monitor_query_ready;
+    xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xmlHttpRequest.send(post_str);
+}
+
+function monitor_query_ready(){
+    if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
+        var text = xmlHttpRequest.responseText;
+        monitor_json = JSON.parse(text);
+        query_page();
     }
 }
 
@@ -143,6 +163,8 @@ function refresh_nav(){
             cc = table_list[j].geoip.mmdb.country.toLowerCase();
         }
         var num_neighbour = table_list[j].neighbour.length;
+        var monitor_list = table_list[j].monitor.split('|');
+        var num_monitor = monitor_list.length;
         row.find("tr:eq("+ j.toString()+")").append('<td>'+ (active_page*page_size+j).toString()+'</td>');
         row.find("tr:eq("+ j.toString()+")").append('<td><span class="flag-icon flag-icon-' + cc + '"></span></td>');
         row.find("tr:eq("+ j.toString()+")").append('<td>' + table_list[j].addr + '</td>');
@@ -150,8 +172,8 @@ function refresh_nav(){
         row.find("tr:eq("+ j.toString()+")").append('<td>' + table_list[j].geoip.bgp.asn + '</td>');
         row.find("tr:eq("+ j.toString()+")").append('<td>' + table_list[j].geoip.bgp.country + '</td>');
         row.find("tr:eq("+ j.toString()+")").append('<td>' + table_list[j].geoip.czdb.country + ','+ table_list[j].geoip.czdb.area +'</td>');
-        row.find("tr:eq("+ j.toString()+")").append('<td>' + table_list[j].monitor + '</td>');
-        row.find("tr:eq("+ j.toString()+")").append('<td><a style=cursor:pointer onclick=neighbour_click('+j.toString()+')>' + num_neighbour + '</a></td>');
+        row.find("tr:eq("+ j.toString()+")").append('<td><a style=cursor:pointer onclick=monitor_click(' + j.toString() + ')>' + num_monitor + '</a></td>');
+        row.find("tr:eq("+ j.toString()+")").append('<td><a style=cursor:pointer onclick=neighbour_click(' + j.toString() + ')>' + num_neighbour + '</a></td>');
     }
     }
 }
@@ -180,4 +202,59 @@ function neighbour_click(j){
     }
 
     $('#neighbour_modal').modal();
+}
+
+function monitor_click(j){
+    var monitor_list = table_list[j].monitor.split('|');
+    var tbl = $("#monitor_table");
+    tbl.find("tbody tr").remove();
+    for (var i=0; i<monitor_list.length; i++) {
+        var m = monitor_list[i];
+        var row = tbl.find("tbody").append("<tr></tr>");
+        
+        if(monitor_json[m]){
+            mon = monitor_json[m];
+            var cc;
+            var geo_list = mon.city.split(", ");
+            cc = geo_list[geo_list.length-1].toLowerCase();
+            row.find("tr:eq("+ i.toString()+")").append('<td>'+ (i).toString()+'</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td><span class="flag-icon flag-icon-' + cc + '"></span></td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>' + m + '</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>' + mon.activation + '</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>' + mon.city + '</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>' + mon.asn + '</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>' + mon.organization + '</td>');
+        }
+        else{
+            row.find("tr:eq("+ i.toString()+")").append('<td>'+ (i).toString()+'</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td><span class="flag-icon flag-icon-un"></span></td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>*</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>*</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>*</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>*</td>');
+            row.find("tr:eq("+ i.toString()+")").append('<td>*</td>');
+        }
+    }
+    $('#monitor_modal').modal();
+}
+
+//add go function.
+d3.select("#go_btn").on("click",go_click);
+
+function go_click(){
+    var value = $("#go_text").val();
+    var reg = new RegExp("\\d+");
+    if (!reg.test(value)){
+        alert("wrong page format");
+        return false;
+    }
+    if (parseInt(value) > num_page || parseInt(value) < 1){
+        alert("page number out of range");
+        return false;
+    }
+
+    active_page = parseInt(value) - 1;
+    start_page = active_page;
+
+    query_page();
 }

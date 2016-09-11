@@ -93,7 +93,7 @@
                     <button type="submit" class="form-control" id="query_btn">filter</button>
 
                     <button type="submit" class="form-control pull-right" id="go_btn">go</button>
-                    <input type="text" class="form-control pull-right" placeholder="page">
+                    <input type="text" class="form-control pull-right" placeholder="page" id="go_text">
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
             <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="neighbour_modal">Modal title</h4>
+                <h4 class="modal-title" id="neighbour_modal">Neighbours List</h4>
             </div>
             <div class="modal-body">
                 <table class="table table-bordered table-hover col-md-10" id="neighbour_table">
@@ -174,6 +174,44 @@
                         <td>CN</td>
                         <td>4538</td>
                         <td>CN</td>
+                        <td>黑龙江省哈尔滨市哈尔滨工业大学</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="monitor_modal" tabindex="-1" role="dialog" aria-labelledby="monitor_modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="monitor_modal">Monitor List</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-hover col-md-10" id="monitor_table">
+                    <thead>
+                    <th>#</th>
+                    <th>icon</th>
+                    <th>Name</th>
+                    <th>Activation Date</th>
+                    <th>City</th>
+                    <th>ASN</th>
+                    <th>Organization</th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>haerbin-cn</td>
+                        <td>2016-09-06</td>
+                        <td>Haerbin, China</td>
+                        <td>4538</td>
                         <td>黑龙江省哈尔滨市哈尔滨工业大学</td>
                     </tr>
                     </tbody>

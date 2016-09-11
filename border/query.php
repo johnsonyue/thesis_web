@@ -4,6 +4,7 @@
 	$username = $config["username"];
 	$password = $config["password"];
 	$database = $config["database"];
+	$data_dir = $config["data_dir"];
 
 	if ( !empty($_POST["type"]) && !empty($_POST["date"]) ){
 		$date = $_POST["date"];
@@ -24,6 +25,9 @@
 				"num_node" => $count
 				);
 			echo json_encode($res);
+		}
+		elseif ($type == "monitor"){
+			echo exec("cat ".$data_dir."/caida_monitor.json");
 		}
 		elseif ($type == "page") {
 			$sql = "";
